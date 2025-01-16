@@ -16,10 +16,8 @@ from telegram.ext import (
     filters
 )
 from googlesearch import search
+
 from Config import TOKEN
-
-
-
 
 
 logging.basicConfig(
@@ -32,7 +30,6 @@ REQUEST_DELAY_FACTOR = 1.5
 MAX_RETRIES = 5
 RETRY_DELAY_BASE = 5
 SEARCH_CACHE = {}
-
 
 (
     WAITING_FOR_NAME,
@@ -248,8 +245,9 @@ async def add_game_handle_epic(update: Update, context: ContextTypes.DEFAULT_TYP
     try:
         cursor.execute("INSERT INTO games (name, genre, steam_link, gog_link, epic_link) VALUES (?, ?, ?, ?, ?)",
                        (
-                       context.user_data['game_name'], context.user_data['game_genre'], context.user_data['steam_link'],
-                       context.user_data['gog_link'], context.user_data['epic_link']))
+                           context.user_data['game_name'], context.user_data['game_genre'],
+                           context.user_data['steam_link'],
+                           context.user_data['gog_link'], context.user_data['epic_link']))
         conn.commit()
         await update.message.reply_text("Игра добавлена в базу данных.")
     except Exception as e:
@@ -267,7 +265,7 @@ async def search_page(query, page_num):
     """
     logging.info(f"Поисковый запрос: {query}, страница: {page_num}")
     try:
-        results_generator = search(query, start=(page_num * 5))
+        results_generator = search(query, num_results=5)
         results_from_page = list(results_generator)
         if results_from_page:
             logging.info(f"Результаты поиска (страница {page_num}):")
@@ -295,7 +293,7 @@ async def search_page_multiple_words(query_words, page_num):
     query = " ".join(query_words)
     logging.info(f"Поисковый запрос (несколько слов): {query}, страница: {page_num}")
     try:
-        results_generator = search(query, start=(page_num * 5))
+        results_generator = search(query, num_results=5)
         results_from_page = list(results_generator)
         if results_from_page:
             logging.info(f"Результаты поиска (страница {page_num}):")
@@ -508,4 +506,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-
